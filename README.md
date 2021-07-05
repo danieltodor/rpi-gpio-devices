@@ -9,9 +9,9 @@ basic functions to manipulate the pins.
 
 ## Installation
 
-`pip install rpi_gpio_devices`
+`pip install rpi-gpio-devices`
 
-[pypi](https://pypi.org/project/rpi_gpio_devices)
+[pypi](https://pypi.org/project/rpi-gpio-devices)
 
 ## Few examples
 
