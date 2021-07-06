@@ -103,7 +103,7 @@ class Fan(PWMDevice):
 
         for i in range(len(self.speed_map)):
             current_map = self.speed_map[i]
-            next_map = self.speed_map[i+1] if len(self.speed_map) >= i+1 else (500, 100)
+            next_map = self.speed_map[i+1] if len(self.speed_map) > i+1 else (500, 100)
             if current_map[0] <= temp < next_map[0]:
                 return current_map[1]
 
