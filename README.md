@@ -1,5 +1,7 @@
 # rpi-gpio-devices
 
+Control Raspberry Pi gpio pins more easily.
+
 This module provides an abstraction layer to control connected devices
 (fans, switches, LEDs, buttons) more easily with ready to use device classes and functions.
 
