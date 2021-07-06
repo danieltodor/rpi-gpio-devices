@@ -20,7 +20,7 @@ classifiers = ['Development Status :: 4 - Beta',
 
 setup(
     name                          = 'rpi_gpio_devices',
-    version                       = '0.1.1',
+    version                       = '0.1.2',
     author                        = 'Daniel Todor',
     description                   = 'This module provides device classes for controlling the gpio ports',
     long_description              = read_content('README.md'),
