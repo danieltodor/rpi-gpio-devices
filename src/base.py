@@ -126,14 +126,15 @@ class PWMDevice(SwitchableDevice):
             gpio.output(self.power, 0)
         self.on = False
 
-    def set_duty_cycle(self, percent):
+    def set_duty_cycle(self, percent, z_off=True):
         """ Set duty cycle.
 
         -:param percent: Duty cycle between 0% and 100%
+        -:param z_off: Turn off at zero
         """
         if not self.pwm:
             raise ValueError("No pin provided for outputting PWM signal")
-        if percent == 0:
+        if z_off and percent == 0:
             self.turn_off()
             return
         if self.is_off():
@@ -142,7 +143,4 @@ class PWMDevice(SwitchableDevice):
             return
         self.message("Duty cycle set to {}%".format(percent))
         self.duty_cycle = percent
-        # If the desired speed is very low, convert it, because some fans doesn`t run on lowest speed with 1%
-        if 0.1 <= percent <= 1:
-            percent = 0
         self.pwm.ChangeDutyCycle(percent)

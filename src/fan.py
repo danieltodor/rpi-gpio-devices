@@ -30,13 +30,13 @@ class Fan(PWMDevice):
                  rpm_measurement_bouncetime=10, **kwargs):
         super().__init__(power, pwm, frequency, **kwargs)
         self.idle_limit = idle_limit
-        self.speed_map = speed_map or (
+        self.speed_map = speed_map or [
             (60, 1),
             (65, 30),
             (70, 50),
             (75, 70),
             (80, 100)
-        )
+        ]
         self.cycletime = cycletime
         self.rpm_measurement_timeout = rpm_measurement_timeout
         self.rpm_measurement_edges = rpm_measurement_edges
@@ -53,7 +53,10 @@ class Fan(PWMDevice):
 
         -:param percent: Fan speed between 0% and 100%
         """
-        self.set_duty_cycle(percent)
+        # If the desired speed is very low, convert it, because some fans doesn`t run on lowest speed with 1%
+        if 0 < percent <= 1:
+            percent = 0
+        self.set_duty_cycle(percent, z_off=False)
 
     def smart_set_speed(self, percent):
         """ Set fan speed with respect to other parameters """
