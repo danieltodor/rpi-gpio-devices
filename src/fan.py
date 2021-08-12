@@ -53,15 +53,18 @@ class Fan(PWMDevice):
 
         -:param percent: Fan speed between 0% and 100%
         """
-        # If the desired speed is very low, convert it, because some fans doesn`t run on lowest speed with 1%
+        z_off = True
+        # If the desired speed is very low, convert it
+        # because some fans doesn`t run on lowest speed if the value is not 0.
         if 0 < percent <= 1:
             percent = 0
-        self.set_duty_cycle(percent, z_off=False)
+            z_off = False
+        self.set_duty_cycle(percent, z_off)
 
     def smart_set_speed(self, percent):
         """ Set fan speed with respect to other parameters """
         # If the desired speed is 0, but the fan not reached the idle limit, do nothing
-        if percent == 0 and self.ontime() < self.idle_limit:
+        if percent == 0 and self.is_on() and self.ontime() < self.idle_limit:
             return
         self.set_speed(percent)
 
