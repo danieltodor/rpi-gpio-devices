@@ -1,2 +1,4 @@
 dist
 rpi_gpio_devices.egg-info
+__pycache__
+.coverage

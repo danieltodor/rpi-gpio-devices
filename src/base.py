@@ -1,8 +1,9 @@
 from datetime import datetime
+
 import RPi.GPIO as gpio
 
 
-class BaseDevice(object):
+class BaseDevice:
     """
     Base class for other devices or classes
 
@@ -10,12 +11,12 @@ class BaseDevice(object):
     -:param gpiowarnings: Gpio configuration warnings
     -:param verbose: Verbose mode
     """
-    def __init__(self, gpiomode="board", gpiowarnings=False, verbose=False):
+    def __init__(self, gpiomode='board', gpiowarnings=False, verbose=False):
         self.verbose = verbose
         # GPIO basic settings
-        if gpiomode == "board":
+        if gpiomode == 'board':
             gpio.setmode(gpio.BOARD)
-        elif gpiomode == "bcm":
+        elif gpiomode == 'bcm':
             gpio.setmode(gpio.BCM)
         gpio.setwarnings(gpiowarnings)
 
@@ -26,7 +27,7 @@ class BaseDevice(object):
 
     def cleanup(self):
         """ Cleanup GPIOs """
-        self.message("Cleanup GPIOs")
+        self.message('Cleanup GPIOs...')
         gpio.cleanup()
 
 
@@ -55,7 +56,8 @@ class SwitchableDevice(BaseDevice):
         """ Turn on the device """
         if self.is_on():
             return
-        self.message("Device turned on")
+        self.message('Device turned on.')
+        self.turned_on_at = datetime.now()
         self.on = True
         gpio.output(self.power, 1)
 
@@ -63,7 +65,8 @@ class SwitchableDevice(BaseDevice):
         """ Turn off the device """
         if self.is_off():
             return
-        self.message("Device turned off")
+        self.message('Device turned off.')
+        self.turned_on_at = False
         self.on = False
         gpio.output(self.power, 0)
 
@@ -79,19 +82,19 @@ class SwitchableDevice(BaseDevice):
         if self.is_off():
             return 0
         difference = datetime.now() - self.turned_on_at
-        ontime = int(difference.total_seconds() / 60)
-        self.message("Ontime {} minute(s)".format(ontime))
+        ontime = int(difference.total_seconds())
+        self.message(f'Ontime {ontime} seconds.')
         return ontime
 
 
 class PWMDevice(SwitchableDevice):
     """ Device that can be controlled with PWM signals
 
-    -:param power: Pin used for giving power supply to the fan
     -:param pwm: Pin used for pwm control
+    -:param power: Pin used for giving power supply (optional)
     -:param frequency: Frequency used for the pwm signal
     """
-    def __init__(self, power, pwm, frequency=100, **kwargs):
+    def __init__(self, pwm, power=False, frequency=100, **kwargs):
         super().__init__(power, **kwargs)
         self.frequency = frequency
         self.duty_cycle = 0 # Duty cycle between 0.0 and 100.0
@@ -104,7 +107,7 @@ class PWMDevice(SwitchableDevice):
         """ Turn on the power and pwm on the lowest setting """
         if self.is_on():
             return
-        self.message("Device turned on")
+        self.message('Device turned on.')
         self.duty_cycle = 0
         self.turned_on_at = datetime.now()
         if self.pwm:
@@ -117,7 +120,7 @@ class PWMDevice(SwitchableDevice):
         """ Turn off the power and pwm """
         if self.is_off():
             return
-        self.message("Device turned off")
+        self.message('Device turned off.')
         self.duty_cycle = 0
         self.turned_on_at = False
         if self.pwm:
@@ -133,7 +136,7 @@ class PWMDevice(SwitchableDevice):
         -:param z_off: Turn off at zero
         """
         if not self.pwm:
-            raise ValueError("No pin provided for outputting PWM signal")
+            raise ValueError('No pin provided for outputting PWM signal!')
         if z_off and percent == 0:
             self.turn_off()
             return
@@ -141,6 +144,6 @@ class PWMDevice(SwitchableDevice):
             self.turn_on()
         elif self.duty_cycle == percent:
             return
-        self.message("Duty cycle set to {}%".format(percent))
+        self.message(f'Duty cycle set to {percent}%.')
         self.duty_cycle = percent
         self.pwm.ChangeDutyCycle(percent)

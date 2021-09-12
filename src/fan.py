@@ -1,8 +1,17 @@
 from time import sleep
 from datetime import datetime
 import subprocess
+from enum import IntEnum
+
 import RPi.GPIO as gpio
+
 from .base import PWMDevice
+
+
+class SM(IntEnum):
+    """ Variable positions inside speed_mapping """
+    TEMP = 0
+    SPEED = 1
 
 
 class Fan(PWMDevice):
@@ -16,8 +25,8 @@ class Fan(PWMDevice):
     -:param pwm: Pin used for PWM control
     -:param cycletime: Cycle time of auto fan control (s)
     -:param frequency: Frequency used for the pwm signal (hz)
-    -:param idle_limit: If fan is on automode, and the temp is below min, only turn off after this limit is reached (m)
-    -:param speed_map: This is used to match temperature readings to fan speed
+    -:param idle_limit: If fan is on automode, and the temp is below min, only turn off after this limit is reached (s)
+    -:param speed_mapping: This is used to match temperature readings to fan speed
         Values are series of tuples in form of: (from_temp, duty_cycle)
     -:param rpm_measurement_timeout: Timeout for the edge detection (ms)
     -:param rpm_measurement_edges: How many edges to record for the calculation
@@ -25,14 +34,14 @@ class Fan(PWMDevice):
         This value is in miliseconds, and should be less than the time for half revolution on maximum speed.
         Calculation: rev_per_sec = max_rpm / 60 --> 1000 / rev_per_sec / 2 = max_bouncetime
     """
-    def __init__(self, power=False, sense=False, pwm=False, cycletime=5, frequency=25000, idle_limit=5,
-                 speed_map=False, rpm_measurement_timeout=2000, rpm_measurement_edges=40,
+    def __init__(self, power=False, sense=False, pwm=False, cycletime=5, frequency=25000, idle_limit=300,
+                 speed_mapping=False, rpm_measurement_timeout=2000, rpm_measurement_edges=40,
                  rpm_measurement_bouncetime=10, **kwargs):
-        super().__init__(power, pwm, frequency, **kwargs)
+        super().__init__(pwm, power, frequency, **kwargs)
         self.idle_limit = idle_limit
-        self.speed_map = speed_map or [
-            (60, 1),
-            (65, 30),
+        self.speed_mapping = speed_mapping or [
+            (20, 1),
+            (40, 30),
             (70, 50),
             (75, 70),
             (80, 100)
@@ -46,7 +55,7 @@ class Fan(PWMDevice):
         if sense:
             gpio.setup(sense, gpio.IN, pull_up_down=gpio.PUD_UP)
         if not power and not pwm:
-            raise ValueError("No pins provided for controlling the fan!")
+            raise ValueError('No pins provided for controlling the fan!')
 
     def set_speed(self, percent):
         """ Set fan speed.
@@ -63,24 +72,25 @@ class Fan(PWMDevice):
 
     def smart_set_speed(self, percent):
         """ Set fan speed with respect to other parameters """
-        # If the desired speed is 0, but the fan not reached the idle limit, do nothing
+        # If the desired speed is 0, but the fan not reached the idle limit, set idle speed
         if percent == 0 and self.is_on() and self.ontime() < self.idle_limit:
-            return
+            percent = 1
         self.set_speed(percent)
 
     def read_hw_temperature(self):
         """ Read hardware temperatures """
-        cpu_temp = round(int(subprocess.check_output(["cat", "/sys/class/thermal/thermal_zone0/temp"]).strip()) / 1000)
-        self.message("Temperature reading {}c".format(cpu_temp))
+        cpu_temp = round(int(subprocess.check_output(['cat', '/sys/class/thermal/thermal_zone0/temp']).strip()) / 1000)
+        self.message(f'Temperature reading {cpu_temp}c.')
         return cpu_temp
 
     def measure_rpm(self):
         """ Measure fan rpm.
 
         Note: Measuring RPM from a script running under an OS (with many other things) can be inaccurate.
+        You can improve it by fine tune the "rpm_measurement_..." variables for a given fan.
         """
         if not self.sense:
-            raise ValueError("No pin was provided for sensing rpm.")
+            raise ValueError('No pin was provided for sensing rpm.')
         edges = self.rpm_measurement_edges
         start_time = datetime.now()
         for _ in range(edges):
@@ -88,13 +98,13 @@ class Fan(PWMDevice):
                                          timeout=self.rpm_measurement_timeout,
                                          bouncetime=self.rpm_measurement_bouncetime)
             if channel is None:
-                self.message("RPM measurement timeout")
+                self.message('RPM measurement timeout.')
                 edges = 0
                 break
         end_time = datetime.now()
         difference = (end_time - start_time).total_seconds()
         rpm = int((edges * (60 / difference)) / 2)
-        self.message("Current rpm: {}".format(rpm))
+        self.message(f'Current rpm: {rpm}')
         return rpm
 
     def temp_to_speed(self, temp):
@@ -103,19 +113,15 @@ class Fan(PWMDevice):
         -:param temp: Temperature in celsius
         """
         # If the temp is below the minimum level, we dont need further processing
-        if temp < self.speed_map[0][0]:
-            self.message("Temp below minimum")
+        if temp < self.speed_mapping[0][SM.TEMP]:
+            self.message('Temperature below minimum.')
             return 0
 
-        for i in range(len(self.speed_map)):
-            current_map = self.speed_map[i]
-            next_map = self.speed_map[i+1] if len(self.speed_map) > i+1 else (500, 100)
-            if current_map[0] <= temp < next_map[0]:
-                return current_map[1]
-
-        # If nothing was matched raise error
-        self.cleanup()
-        raise ValueError("Matching speed to temperature failed!")
+        for i in range(len(self.speed_mapping)):
+            current_mapping = self.speed_mapping[i]
+            next_mapping = self.speed_mapping[i+1] if len(self.speed_mapping) > i+1 else (500, 100)
+            if current_mapping[SM.TEMP] <= temp < next_mapping[SM.TEMP]:
+                return current_mapping[SM.SPEED]
 
     def auto_set(self, temp=False):
         """ Set fan speed automatically based on temperature and the speedmap
