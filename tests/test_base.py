@@ -69,6 +69,7 @@ def test_pwm_device_turn_on_off_methods_single_pin():
     assert pwm.is_off() is False
     assert pwm.is_on() is True
     assert_output(pin1, HIGH)
+    assert_duty_cycle(pin1, 0)
 
     pwm.turn_off()
     assert pwm.is_off() is True
@@ -92,6 +93,7 @@ def test_pwm_device_turn_on_off_methods():
     assert pwm.is_on() is True
     assert_output(pin1, HIGH)
     assert_output(pin2, HIGH)
+    assert_duty_cycle(pin1, 0)
 
     pwm.turn_off()
     assert pwm.is_off() is True
