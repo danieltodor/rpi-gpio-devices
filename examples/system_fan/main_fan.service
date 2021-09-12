@@ -1,0 +1,10 @@
+[Unit]
+Description=Main fan for raspberry
+
+[Service]
+User=root
+ExecStart=/usr/local/etc/raspberry/gpio/main_fan.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

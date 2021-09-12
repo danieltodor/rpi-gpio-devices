@@ -20,8 +20,8 @@ basic functions to manipulate the pins.
 #### Automatic fan control based on CPU temp
 ``` py
 from time import sleep
-from rpi_gpio_devices import Fan
 
+from rpi_gpio_devices import Fan
 
 # Basic usage
 pwm_fan = Fan(power=29, sense=35, pwm=33)
@@ -36,36 +36,36 @@ except KeyboardInterrupt:
 #### Set LED brightness with PWM
 ``` py
 from time import sleep
+
 from rpi_gpio_devices import PWMLED
 
+pwmled = PWMLED(33)
 
-PWMLED1 = PWMLED(33)
-
-PWMLED1.set_brightness(50)
+pwmled.set_brightness(50)
 sleep(2)
-PWMLED1.set_brightness(100)
+pwmled.set_brightness(100)
 sleep(2)
-PWMLED1.set_brightness(0)
-# PWMLED1.turn_off() # Or simply just turn it off
+pwmled.set_brightness(0)
+# pwmled.turn_off() # Or simply just turn it off
 
-PWMLED1.cleanup()
+pwmled.cleanup()
 ```
 
 #### Check if a button is pressed
 ``` py
 from time import sleep
+
 from rpi_gpio_devices import Button
 
-
-Button1 = Button(11)
+button = Button(11)
 
 try:
     while True:
-        if Button1.is_pressed():
-            print('Button1 is pressed!')
+        if button.is_pressed():
+            print('Button is pressed!')
         sleep(0.5)
 except KeyboardInterrupt:
-    Button1.cleanup()
+    button.cleanup()
 ```
 
 More in the [examples](https://github.com/danieltodor/rpi-gpio-devices/tree/master/examples)

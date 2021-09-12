@@ -1,0 +1,10 @@
+[Unit]
+Description=Power button and LED for raspberry
+
+[Service]
+User=root
+ExecStart=/usr/local/etc/raspberry/gpio/power_button.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
