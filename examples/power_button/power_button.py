@@ -44,7 +44,7 @@ try:
             shutdown_light()
             break
         sleep(1)
-except (InterruptedError, KeyboardInterrupt):
+except InterruptedError:
     power_button.cleanup()
     sys.exit()
 

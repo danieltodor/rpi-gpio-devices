@@ -24,5 +24,5 @@ signal.signal(signal.SIGTERM, sighandle)
 try:
     while True:
         fan.auto_set()
-except (InterruptedError, KeyboardInterrupt):
+except InterruptedError:
     fan.cleanup()
