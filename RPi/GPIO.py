@@ -20,22 +20,27 @@ RISING = 31
 FALLING = 32
 BOTH = 33
 
-# Setup gpio_pins
 gpio_pins = {}
-pin_values = {
-    'mode': None, # input or output
-    'output': LOW, # low or high
-    'input': None, # to check the level of an input pin
-    'duty_cycle': 0, # pwm duty cycle
-    'pwm': False, # pin was set to PWM or not
-    'pull_up_down': False
-}
-for i in range(1, 40):
-    gpio_pins[i] = {**pin_values}
+
+
+def setup_gpio_pins():
+    pin_values = {
+        'mode': None, # input or output
+        'output': LOW, # low or high
+        'input': None, # to check the level of an input pin
+        'duty_cycle': 0, # pwm duty cycle
+        'pwm': False, # pin was set to PWM or not
+        'pull_up_down': False # pull up/down states for input pins
+    }
+    for i in range(1, 41):
+        gpio_pins[i] = {**pin_values}
+
+
+setup_gpio_pins()
 
 
 def cleanup():
-    pass
+    setup_gpio_pins()
 
 
 def get_pin(pin):
