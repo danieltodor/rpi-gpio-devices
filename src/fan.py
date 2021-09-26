@@ -57,15 +57,14 @@ class Fan(PWMDevice):
         if not power and not pwm:
             raise ValueError('No pins provided for controlling the fan!')
 
-    def set_speed(self, percent):
+    def set_speed(self, percent, z_low=True):
         """ Set fan speed.
 
         -:param percent: Fan speed between 0% and 100%
+        -:param z_low: Send low values as 0, without turning off fan (to force pwm fan to lowest speed)
         """
         z_off = True
-        # If the desired speed is very low, convert it
-        # because some fans doesn`t run on lowest speed if the value is not 0.
-        if 0 < percent <= 1:
+        if z_low and 0 < percent <= 1:
             percent = 0
             z_off = False
         self.set_duty_cycle(percent, z_off)
