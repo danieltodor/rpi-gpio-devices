@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 import RPi.GPIO as gpio
@@ -9,21 +10,26 @@ class BaseDevice:
 
     -:param gpiomode: Gpio pin numbering mode. "board" or "bcm"
     -:param gpiowarnings: Gpio configuration warnings
-    -:param verbose: Verbose mode
+    -:param log: If True, log what happens
+    -:param log_file: File to save log messages
     """
-    def __init__(self, gpiomode='board', gpiowarnings=False, verbose=False):
-        self.verbose = verbose
+    def __init__(self, gpiomode='board', gpiowarnings=False, log=False, log_file=''):
+        self.log = log
+        if log:
+            logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s',
+                                datefmt='%Y-%m-%d %H:%M:%S',
+                                level=logging.INFO,
+                                filename=log_file,
+                                filemode='w')
+            self._logger = logging.getLogger()
         # GPIO basic settings
-        if gpiomode == 'board':
-            gpio.setmode(gpio.BOARD)
-        elif gpiomode == 'bcm':
-            gpio.setmode(gpio.BCM)
+        gpio.setmode({'board': gpio.BOARD, 'bcm': gpio.BCM}[gpiomode])
         gpio.setwarnings(gpiowarnings)
 
-    def message(self, val):
-        """ Print messages if device is in verbose mode """
-        if self.verbose:
-            print(val)
+    def message(self, value):
+        """ Print messages if log mode is on """
+        if self.log:
+            self._logger.info(value)
 
     def cleanup(self):
         """ Cleanup GPIOs """
