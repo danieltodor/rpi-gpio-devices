@@ -8,9 +8,9 @@ from .base import BaseDevice
 class Button(BaseDevice):
     """ Button device
 
-    -:param pin: Which pin is connected to the button
-    -:param debounce_time: Debounce time when checking button state (ms)
-    -:param polarity: When you press the button, will the pin be connected to low or high?
+    :param pin: Which pin is connected to the button
+    :param debounce_time: Debounce time when checking button state (ms)
+    :param polarity: When you press the button, will the pin be connected to low or high?
     """
     def __init__(self, pin, debounce_time=200, polarity='low', **kwargs):
         super().__init__(**kwargs)

@@ -8,10 +8,10 @@ class BaseDevice:
     """
     Base class for other devices or classes
 
-    -:param gpiomode: Gpio pin numbering mode. "board" or "bcm"
-    -:param gpiowarnings: Gpio configuration warnings
-    -:param log: If True, log what happens
-    -:param log_file: File to save log messages
+    :param gpiomode: Gpio pin numbering mode. "board" or "bcm"
+    :param gpiowarnings: Gpio configuration warnings
+    :param log: If True, log what happens
+    :param log_file: File to save log messages
     """
     def __init__(self, gpiomode='board', gpiowarnings=False, log=False, log_file=''):
         self.log = log
@@ -40,7 +40,7 @@ class BaseDevice:
 class SwitchableDevice(BaseDevice):
     """ Device that can be switched on or off
 
-    -:param power: Pin used for powering the device
+    :param power: Pin used for powering the device
     """
     def __init__(self, power, **kwargs):
         super().__init__(**kwargs)
@@ -96,9 +96,9 @@ class SwitchableDevice(BaseDevice):
 class PWMDevice(SwitchableDevice):
     """ Device that can be controlled with PWM signals
 
-    -:param pwm: Pin used for pwm control
-    -:param power: Pin used for giving power supply (optional)
-    -:param frequency: Frequency used for the pwm signal
+    :param pwm: Pin used for pwm control
+    :param power: Pin used for giving power supply (optional)
+    :param frequency: Frequency used for the pwm signal
     """
     def __init__(self, pwm, power=False, frequency=100, **kwargs):
         super().__init__(power, **kwargs)
@@ -138,8 +138,8 @@ class PWMDevice(SwitchableDevice):
     def set_duty_cycle(self, percent, z_off=True):
         """ Set duty cycle.
 
-        -:param percent: Duty cycle between 0% and 100%
-        -:param z_off: Turn off at zero
+        :param percent: Duty cycle between 0% and 100%
+        :param z_off: Turn off at zero
         """
         if not self.pwm:
             raise ValueError('No pin provided for outputting PWM signal!')

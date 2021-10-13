@@ -20,17 +20,17 @@ class Fan(PWMDevice):
     and even measure it's RPM (this can be inaccurate).
     You need either power or pwm (or both) pins defined to control the fan!
 
-    -:param power: Pin used for giving power supply to the fan (through a relay or fet module)
-    -:param sense: Pin used for measuring RPM
-    -:param pwm: Pin used for PWM control
-    -:param cycletime: Cycle time of auto fan control (s)
-    -:param frequency: Frequency used for the pwm signal (hz)
-    -:param idle_limit: If fan is on automode, and the temp is below min, only turn off after this limit is reached (s)
-    -:param speed_mapping: This is used to match temperature readings to fan speed
+    :param power: Pin used for giving power supply to the fan (through a relay or fet module)
+    :param sense: Pin used for measuring RPM
+    :param pwm: Pin used for PWM control
+    :param cycletime: Cycle time of auto fan control (s)
+    :param frequency: Frequency used for the pwm signal (hz)
+    :param idle_limit: If fan is on automode, and the temp is below min, only turn off after this limit is reached (s)
+    :param speed_mapping: This is used to match temperature readings to fan speed
         Values are series of tuples in form of: (from_temp, duty_cycle)
-    -:param rpm_measurement_timeout: Timeout for the edge detection (ms)
-    -:param rpm_measurement_edges: How many edges to record for the calculation
-    -:param rpm_measurement_bouncetime: After an edge detection, the next edge will be ignored for this duration (ms)
+    :param rpm_measurement_timeout: Timeout for the edge detection (ms)
+    :param rpm_measurement_edges: How many edges to record for the calculation
+    :param rpm_measurement_bouncetime: After an edge detection, the next edge will be ignored for this duration (ms)
         This value is in miliseconds, and should be less than the time for half revolution on maximum speed.
         Calculation: rev_per_sec = max_rpm / 60 --> 1000 / rev_per_sec / 2 = max_bouncetime
     """
@@ -60,8 +60,8 @@ class Fan(PWMDevice):
     def set_speed(self, percent, z_low=True):
         """ Set fan speed.
 
-        -:param percent: Fan speed between 0% and 100%
-        -:param z_low: Send low values as 0, without turning off fan (to force pwm fan to lowest speed)
+        :param percent: Fan speed between 0% and 100%
+        :param z_low: Send low values as 0, without turning off fan (to force pwm fan to lowest speed)
         """
         z_off = True
         if z_low and 0 < percent <= 1:
@@ -109,7 +109,7 @@ class Fan(PWMDevice):
     def temp_to_speed(self, temp):
         """ Determine speed setting for the current temperature.
 
-        -:param temp: Temperature in celsius
+        :param temp: Temperature in celsius
         """
         # If the temp is below the minimum level, we dont need further processing
         if temp < self.speed_mapping[0][SM.TEMP]:
@@ -125,7 +125,7 @@ class Fan(PWMDevice):
     def auto_set(self, temp=False):
         """ Set fan speed automatically based on temperature and the speedmap
 
-        -:param temp: Provide a temperature value, otherwise the CPU temp will be used
+        :param temp: Provide a temperature value, otherwise the CPU temp will be used
         """
         ctemp = temp or self.read_hw_temperature()
         speed = self.temp_to_speed(ctemp)
