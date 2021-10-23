@@ -58,23 +58,29 @@ class SwitchableDevice(BaseDevice):
         """ True if device is off """
         return not self.on
 
+    def _turn_on(self):
+        self.message('Device turned on.')
+        self.turned_on_at = datetime.now()
+        self.on = True
+
     def turn_on(self):
         """ Turn on the device """
         if self.is_on():
             return
-        self.message('Device turned on.')
-        self.turned_on_at = datetime.now()
-        self.on = True
         gpio.output(self.power, 1)
+        self._turn_on()
+
+    def _turn_off(self):
+        self.message('Device turned off.')
+        self.turned_on_at = False
+        self.on = False
 
     def turn_off(self):
         """ Turn off the device """
         if self.is_off():
             return
-        self.message('Device turned off.')
-        self.turned_on_at = False
-        self.on = False
         gpio.output(self.power, 0)
+        self._turn_off()
 
     def toggle(self):
         """ Toggle device """
@@ -113,27 +119,23 @@ class PWMDevice(SwitchableDevice):
         """ Turn on the power and pwm on the lowest setting """
         if self.is_on():
             return
-        self.message('Device turned on.')
         self.duty_cycle = 0
-        self.turned_on_at = datetime.now()
         if self.pwm:
             self.pwm.start(0)
         if self.power:
             gpio.output(self.power, 1)
-        self.on = True
+        self._turn_on()
 
     def turn_off(self):
         """ Turn off the power and pwm """
         if self.is_off():
             return
-        self.message('Device turned off.')
         self.duty_cycle = 0
-        self.turned_on_at = False
         if self.pwm:
             self.pwm.stop()
         if self.power:
             gpio.output(self.power, 0)
-        self.on = False
+        self._turn_off()
 
     def set_duty_cycle(self, percent, z_off=True):
         """ Set duty cycle.
