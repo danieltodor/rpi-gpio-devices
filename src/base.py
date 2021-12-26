@@ -5,8 +5,7 @@ import RPi.GPIO as gpio
 
 
 class BaseDevice:
-    """
-    Base class for other devices or classes
+    """ Base class for other devices or classes
 
     :param gpiomode: Gpio pin numbering mode. "board" or "bcm"
     :param gpiowarnings: Gpio configuration warnings

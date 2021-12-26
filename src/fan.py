@@ -1,17 +1,10 @@
 from time import sleep
 from datetime import datetime
-import subprocess
-from enum import IntEnum
+from subprocess import check_output
 
 import RPi.GPIO as gpio
 
 from .base import PWMDevice
-
-
-class SM(IntEnum):
-    """ Variable positions inside speed_mapping """
-    TEMP = 0
-    SPEED = 1
 
 
 class Fan(PWMDevice):
@@ -78,7 +71,7 @@ class Fan(PWMDevice):
 
     def read_hw_temperature(self):
         """ Read hardware temperatures """
-        cpu_temp = round(int(subprocess.check_output(['cat', '/sys/class/thermal/thermal_zone0/temp']).strip()) / 1000)
+        cpu_temp = round(int(check_output(['cat', '/sys/class/thermal/thermal_zone0/temp']).strip()) / 1000)
         self.message(f'Temperature reading {cpu_temp}c.')
         return cpu_temp
 
@@ -111,16 +104,19 @@ class Fan(PWMDevice):
 
         :param temp: Temperature in celsius
         """
+        TEMP = 0
+        SPEED = 1
+
         # If the temp is below the minimum level, we dont need further processing
-        if temp < self.speed_mapping[0][SM.TEMP]:
+        if temp < self.speed_mapping[0][TEMP]:
             self.message('Temperature below minimum.')
             return 0
 
         for i in range(len(self.speed_mapping)):
             current_mapping = self.speed_mapping[i]
             next_mapping = self.speed_mapping[i+1] if len(self.speed_mapping) > i+1 else (500, 100)
-            if current_mapping[SM.TEMP] <= temp < next_mapping[SM.TEMP]:
-                return current_mapping[SM.SPEED]
+            if current_mapping[TEMP] <= temp < next_mapping[TEMP]:
+                return current_mapping[SPEED]
 
     def auto_set(self, temp=False):
         """ Set fan speed automatically based on temperature and the speedmap

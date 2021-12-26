@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import signal
+from time import sleep
 
 from rpi_gpio_devices import Fan
 
@@ -20,6 +21,9 @@ def sighandle(signum, frame):
 
 signal.signal(signal.SIGINT, sighandle)
 signal.signal(signal.SIGTERM, sighandle)
+
+fan.turn_on()
+sleep(1)
 
 try:
     while True:
