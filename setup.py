@@ -16,13 +16,15 @@ classifiers = ['Development Status :: 5 - Production/Stable',
                'Programming Language :: Python :: 3.7',
                'Programming Language :: Python :: 3.8',
                'Programming Language :: Python :: 3.9',
+               'Programming Language :: Python :: 3.10',
+               'Programming Language :: Python :: 3.11',
                'Topic :: Software Development',
                'Topic :: Home Automation',
                'Topic :: System :: Hardware']
 
 setup(
     name                          = 'rpi_gpio_devices',
-    version                       = '1.0.0',
+    version                       = '2.0.0',
     author                        = 'Daniel Todor',
     description                   = 'This module provides device classes for controlling the gpio ports',
     long_description              = read_content('README.md'),
