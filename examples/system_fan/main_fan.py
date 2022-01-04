@@ -24,6 +24,7 @@ signal.signal(signal.SIGTERM, sighandle)
 
 fan.turn_on()
 sleep(1)
+fan.turn_off()
 
 try:
     while True:
