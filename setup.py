@@ -24,7 +24,7 @@ classifiers = ['Development Status :: 5 - Production/Stable',
 
 setup(
     name                          = 'rpi_gpio_devices',
-    version                       = '2.0.0',
+    version                       = '2.0.1',
     author                        = 'Daniel Todor',
     description                   = 'This module provides device classes for controlling the gpio ports',
     long_description              = read_content('README.md'),
@@ -35,5 +35,5 @@ setup(
     classifiers                   = classifiers,
     packages                      = ['rpi_gpio_devices'],
     package_dir                   = {'rpi_gpio_devices': 'src'},
-    install_requires              = ['RPi.GPIO==0.7.1a4']
+    install_requires              = ['RPi.GPIO==0.7.1']
 )
